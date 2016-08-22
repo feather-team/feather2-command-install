@@ -89,7 +89,7 @@ module.exports = function(name){
         });
 
         //clean source map
-        _.find(dir, /\.map/).forEach(function(file){
+        _.find(dir, /\.map$/).forEach(function(file){
             del(dir, file);
         })
 
