@@ -1,12 +1,18 @@
 {
   "name": "feather2-command-install",
   "version": "1.0.0",
-  "description": "",
+  "description": "安装组件",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feather-team/feather2-command-install.git"
+  },
+  "author": {
+    "name": "jsyczhanghao@sina.com"
+  },
   "license": "ISC",
   "dependencies": {
     "bower": "^1.7.9"
