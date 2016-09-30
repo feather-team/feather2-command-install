@@ -12,6 +12,43 @@ exports.options = {
 var bower = require('bower');
 var clean = require('./clean.js');
 
+var UnRequireDepsKeyWords = {
+    'jQuery': 'jquery',
+    'angular': 'angular',
+    'Zepto': 'zepto',
+    'Vue': 'vue'
+};
+
+function downloadUnRequireDeps(name){
+
+}
+
+function complete(pkgs){
+    // feather.util.map(pkgs, function(name, info){
+    //     downloadUnRequireDeps(name);        
+    // });
+
+    feather.util.map(pkgs, function(name, info){
+        console.log('\n' + name + '@' + info.pkgMeta.version + ' components/' + name);
+
+        var deps = [];
+
+        feather.util.map(info.dependencies || {}, function(name, info){
+            deps.push(name + '@' + info.pkgMeta.version);
+        });
+
+        var max = deps.length - 1;
+
+        deps.forEach(function(dep, key){
+            var b = key == max ? '└──' : '├──';
+            console.log(b + ' ' + dep);
+        });
+
+        //clean 
+        clean(name);
+    });
+}
+
 exports.run = function(argv, cli, env) {
     if(argv.h || argv.help){
         return cli.help(exports.usage, exports.options);
@@ -24,36 +61,23 @@ exports.run = function(argv, cli, env) {
     try{
         argv.directory = 'components';
         bower.commands.install(pkgs, argv, argv).on('log', function(data){
-            var pkgName = data.data.endpoint.source + '@' + data.data.endpoint.target;
-            var message = [
-                'download',
-                feather.util.pad(pkgName, 20, ' ').green,
-                feather.util.pad(data.id, 15, ' ', true).blue,
-                data.message
-            ];
-
+            if(data.data.endpoint){
+                var pkgName = data.data.endpoint.source + '@' + data.data.endpoint.target;
+                var message = [
+                    'download',
+                    feather.util.pad(pkgName, 20, ' ').green,
+                    feather.util.pad(data.id, 15, ' ', true).blue,
+                    data.message
+                ];
+            }else{
+                var message = [
+                    data.id.yellow,
+                    data.message
+                ];
+            }
+            
             console.log(message.join('  '));
-        }).on('end', function(pkgs){
-            feather.util.map(pkgs, function(name, info){
-                console.log('\n' + name + '@' + info.pkgMeta.version + ' components/' + name);
-
-                var deps = [];
-
-                feather.util.map(info.dependencies || {}, function(name, info){
-                    deps.push(name + '@' + info.pkgMeta.version);
-                });
-
-                var max = deps.length - 1;
-
-                deps.forEach(function(dep, key){
-                    var b = key == max ? '└──' : '├──';
-                    console.log(b + ' ' + dep);
-                });
-
-                //clean 
-                clean(name);
-            });
-        });
+        }).on('end', complete);
     }catch(e){};
 
     process.on('uncaughtException', function(err){
