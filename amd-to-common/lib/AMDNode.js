@@ -30,11 +30,11 @@ AMDNode.prototype.isCommonJs = function(){
     return false;
   } 
 
-  if( node.test.operator !== '!==' || !node.test.left || node.test.left.operator !== 'typeof' ){
+  if( !( (node.test.operator === '!==' && node.test.left && node.test.left.operator === 'typeof') || (node.test.operator === '&&' && node.test.left && node.test.left.operator === '===' && node.test.left.left.operator == 'typeof') ) ) {
     return false;
   }
-
-  return Boolean( node.test.left.argument && (node.test.left.argument.name === 'exports' || node.test.left.argument.name === 'module') && node.test.right.value === 'undefined');
+ // console.log(JSON.stringify(node,null,4));
+  return Boolean( ( _.has(node.test.left, "argument") && (node.test.left.argument.name === 'exports' || node.test.left.argument.name === 'module') && node.test.right.value === 'undefined') || ( _.has(node.test.left.left, "argument") && ( node.test.left.left.argument.name === 'exports' || node.test.left.left.argument.name === 'module' || node.test.left.left.argument.name === 'module.exports') && node.test.left.right.value === 'object') ) ;
 };
 
 AMDNode.prototype.isAmd= function(){
