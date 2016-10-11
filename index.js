@@ -11,6 +11,7 @@ exports.options = {
 
 var bower = require('bower');
 var clean = require('./clean.js');
+var amd2commonjs = require('./amd2commonjs.js');
 
 exports.run = function(argv, cli, env) {
     if(argv.h || argv.help){
@@ -52,6 +53,9 @@ exports.run = function(argv, cli, env) {
 
                 //clean 
                 clean(name);
+
+                //amd2commonjs
+                amd2commonjs(name);
             });
         });
     }catch(e){};
