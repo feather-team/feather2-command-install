@@ -20,7 +20,7 @@ var AMDToCommon = (function(){
   var _convert = function(options){
     options = options || {};
     this.files = options.files;
-    console.log("options.files: "+options.files);
+    // console.log("options.files: "+options.files);
     this.parseOptions = { range: true, comment: true };
   };
 
@@ -29,7 +29,7 @@ var AMDToCommon = (function(){
    */
   _convert.prototype.analyse = function(){
     _.each(this.files, _.bind(function(filename){
-      console.log("filename: "+filename);
+      // console.log("filename: "+filename);
       var content = fs.readFileSync(filename, 'utf-8');
       // console.log('Analysing file ' + filename);
       var newContent = this.convertToCommon(content);
@@ -63,21 +63,18 @@ var AMDToCommon = (function(){
       
       /*判断是否有commonjs兼容格式*/
       if( amdNode.isCommonJs() ){
-        console.log("111");
         isIfCJS = true;
         isIfCJSNode =  amdNode;
       }  
       
       /*判断是否有amd兼容格式*/
       if( amdNode.isAmd() ){
-        console.log("222");
         isIfAMD = true;
         isIfAMDNode =  amdNode;
       } 
       
       /*获取amd形式定义的函数*/
       if(amdNode.isAMDStyle()){
-        console.log("333");
         memo.push(amdNode);
         validNodeIndex = amdNode.getValidNodeIndex();
       }
@@ -85,13 +82,11 @@ var AMDToCommon = (function(){
       return memo;
     }, []);
     
-    console.log("isIfCJS: "+ isIfCJS);
-    console.log("isIfAMD: "+ isIfAMD);
+    // console.log("isIfCJS: "+ isIfCJS);
+    // console.log("isIfAMD: "+ isIfAMD);
     /*如果既有cjs定义，又有amd形式定义，直接去掉amd兼容*/
     if( isIfCJS ){
-      console.log("444");
       if( isIfAMD ){
-         console.log("555");
           var range = isIfAMDNode.getRange();
           var fileResult =  content.replace(content.substring(range[0],range[1]), '');
           return fileResult;
@@ -113,6 +108,12 @@ var AMDToCommon = (function(){
     var defineStartIndex =  validNode.node.range[0];
     var defineEndIndex = validNode.node.range[1];
     var fileResult =  content.replace(content.substring(defineStartIndex,defineEndIndex), commonjsResult);
+
+    if( !isIfCJS ){
+      if( isIfAMD ){
+        fileResult = fileResult.replace('define.amd','true');
+      }
+    }
 
     return fileResult;
   };
