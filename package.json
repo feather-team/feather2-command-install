@@ -15,6 +15,8 @@
   },
   "license": "ISC",
   "dependencies": {
-    "bower": "^1.7.9"
+    "bower": "^1.7.9",
+    "esprima": "^2.5.0",
+    "traverse": "~0.6.6"
   }
 }
