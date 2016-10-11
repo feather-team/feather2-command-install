@@ -29,13 +29,12 @@ AMDNode.prototype.isCommonJs = function(){
   if(!node || !node.type || node.type !== 'IfStatement'){
     return false;
   } 
-  // console.log(JSON.stringify(node,null,4));
-  if( node.test.operator !== '!==' || node.test.operator !== '===' || !node.test.left || node.test.left.operator !== 'typeof' ){
+
+  if( node.test.operator !== '!==' || !node.test.left || node.test.left.operator !== 'typeof' ){
     return false;
   }
-  console.log("111222");
 
-  return Boolean( node.test.left.argument && (node.test.left.argument.name === 'exports' || node.test.left.argument.name === 'module') &&  ( node.test.right.value === 'undefined' || node.test.right.value === 'object' ) );
+  return Boolean( node.test.left.argument && (node.test.left.argument.name === 'exports' || node.test.left.argument.name === 'module') && node.test.right.value === 'undefined');
 };
 
 AMDNode.prototype.isAmd= function(){
@@ -89,7 +88,7 @@ AMDNode.prototype.isAMDStyle = function(){
   if(!this.isDefine()){
     return false;
   }
-  console.log("111444");
+
   var defineArguments = this.node.expression.arguments;
 
   var defineArgumentsLen = defineArguments.length;

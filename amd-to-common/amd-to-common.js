@@ -50,7 +50,7 @@ var AMDToCommon = (function(){
    * @returns {String} The converted source, or the same source if nothing changed.
    */
   _convert.prototype.convertToCommon = function(content){
-    console.log("convertToCommon");
+
     var code = esprima.parse(content, this.parseOptions);
     // console.log(JSON.stringify(code,null,4));
 
@@ -97,7 +97,6 @@ var AMDToCommon = (function(){
           return fileResult;
       }
     }
-     console.log("666");
     /*amd-to-common*/
     var validNode = _.first(amdNodes);
 
@@ -106,13 +105,9 @@ var AMDToCommon = (function(){
     }
 
     var withRequire = requireConverter(content, validNode);
-    console.log("777");
     var secondPassNode = esprima.parse(withRequire, this.parseOptions);
-    console.log("888");
     var withExport = exportConverter(withRequire, secondPassNode);
-    console.log("999");
     var thirdPassNode = esprima.parse(withExport, this.parseOptions);
-    console.log("000");
     var commonjsResult =  strictConverter(withExport, thirdPassNode);
     // console.log(JSON.stringify(commonjsResult,null,4));
     var defineStartIndex =  validNode.node.range[0];
