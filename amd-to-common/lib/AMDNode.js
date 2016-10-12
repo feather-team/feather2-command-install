@@ -53,11 +53,12 @@ AMDNode.prototype.isAmd= function(){
 AMDNode.prototype.getRange = function(){
   var node = this.node;
 
-  if( _.has(node, "alternate") ){
-    return new Array(node.range[0], node.alternate.range[0]);
+  if( _.has(node, "alternate") && _.has(node.alternate, "range") ){
+      return new Array(node.range[0],node.alternate.range[0]);
   }else{
     return node.range;
   }
+  
 };
 /**
  * Determine whether a node represents a requireJS 'define' call.
