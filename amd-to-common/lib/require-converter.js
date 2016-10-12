@@ -42,6 +42,7 @@ var getRequireStatements = function(content, amdNode){
  * @param amdNode
  * @returns {string}
  */
+
 var addImportStatements = function(content, amdNode){
   var defineEnd = amdNode.node.range[1];
   var functionNode = amdNode.getFunctionNode();
@@ -72,7 +73,7 @@ var addImportStatements = function(content, amdNode){
  * @param {AMDNode} amdNode The AMD node
  * @returns {string} The converted source.
  */
-var addRequireStatement = function(content, amdNode){
+ addRequireStatement = function(content, amdNode){
   var argumentsStart = amdNode.getArrayNode().range[0];
   var functionNode = amdNode.getFunctionNode();
   var defineStart = amdNode.node.range[0];
@@ -84,8 +85,6 @@ var addRequireStatement = function(content, amdNode){
     var blockContent = content.substring(functionBlockStart, content.length);
     var result = defineString + newDefine + blockContent;
     return defineString + newDefine + blockContent;
-    // var result = blockContent;
-    // return blockContent;
   }else if( amdNode.getIsFunctionNode() == 2){
     var functionBlockStart = functionNode.range[0];
     var functionBlockEnd = functionNode.range[1];
@@ -93,8 +92,6 @@ var addRequireStatement = function(content, amdNode){
     var blockContent = content.substring(functionBlockStart, functionBlockEnd);
     var result = defineString + newDefine + 'return ' + blockContent + '});';
     return defineString + newDefine + 'return ' + blockContent + '});';
-    // var result = 'return ' + blockContent;
-    // return 'return ' + blockContent;
   }else if( amdNode.getIsFunctionNode() == 3){
     var functionBlockStart = functionNode.range[0];
     var newDefine = 'function(require, exports, module){';
@@ -102,25 +99,7 @@ var addRequireStatement = function(content, amdNode){
     var blockContent = 'return '+ functionNode.name + '(\n' + requireStatements.join(',\n') + '\n);});';
     var result = defineString + newDefine + blockContent ;
     return defineString + newDefine + blockContent;
-    // var blockContent = 'return '+ functionNode.name + '();';
-    // var result = blockContent ;
-    // return blockContent;
   }
-
-  // console.log(blockContent);
-  // console.log('**************');
-  // console.log(argumentsStart);
-  // console.log('**************');
-  // console.log(JSON.stringify(functionNode,null,4));
-  // console.log('**************');
-  // console.log(functionBlockStart);
-  // console.log('**************');
-  // console.log(defineString);
-  // console.log('**************');
-  // console.log(blockContent);
-  // console.log('**************');
-  // console.log(result);
-  // console.log('******&&&&&&&&&&&******');
 };
 
 /**
