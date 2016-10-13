@@ -9,29 +9,31 @@ var _ = require('underscore');
  */
 var makeRequireStatement = function(name, identifier, type){
   //改进er：如果依赖里有require、exports、module，则无需为他们定义变量
-  if( type != 3 ){
-    if( name && name!='require' && name!='exports' && name!='module'){
-      return 'var ' + name + ' = require(\'' + identifier + '\');';
-    }else{
-      return '';
+  if( name ){
+    if( name!='require' && name!='exports' && name!='module'){
+      if( identifier != undefined ){
+        return 'var ' + identifier + ' = require(\'' + name + '\');';
+      }else{
+        if( type == 3 ){
+          return 'require(\'' + name + '\'),';
+        }else{
+          return 'require(\'' + name + '\');';
+        }
+      }
     }
-  }else{
-    return 'require(\'' + identifier + '\')';
   }
+  return '';
 };
 
 var getRequireStatements = function(content, amdNode){
   var requireStatementsType = amdNode.getIsFunctionNode() ;
-  if( requireStatementsType != 3 ){
-    var requireStatements = _.reduce(amdNode.getDependencyMap(), function(memo, name, identifier){
+  var requireStatements = _.reduce(amdNode.getDependencyMap(), function(memo,identifier,name){
       memo = memo + '\n  ' + makeRequireStatement(name, identifier, requireStatementsType );
       return memo;
-    }, '');
-  }else{
-    var requireStatements = _.reduce(amdNode.getDependencyMap(), function(memo, name, identifier){
-      memo.push(makeRequireStatement(name, identifier, requireStatementsType));
-      return memo;
-    }, []);
+  }, '');
+
+  if( requireStatementsType == 3 ){
+    requireStatements = requireStatements.substring(0, requireStatements.length-1);
   }
   return requireStatements;
 };
@@ -44,24 +46,29 @@ var getRequireStatements = function(content, amdNode){
  */
 
 var addImportStatements = function(content, amdNode){
+  console.log(JSON.stringify(amdNode,null,4));
   var defineEnd = amdNode.node.range[1];
   var functionNode = amdNode.getFunctionNode();
   var requireStatements = '';
-
-  if( amdNode.getIsFunctionNode() == 1){
-    var functionBlockStart = functionNode.body.range[0] + 1;
-  }else{
-    var functionBlockStart = functionNode.range[0] + 1;
-  }
 
   if( amdNode.getValidNodeIndex() != -1){
     requireStatements = getRequireStatements(content, amdNode);
   } 
 
-  var defineStatement = content.substring(0, functionBlockStart);
-  var block = content.substring(functionBlockStart, defineEnd);
+  if( functionNode != null ){
+    if( amdNode.getIsFunctionNode() == 1){
+      var functionBlockStart = functionNode.body.range[0] + 1;
+    }else{
+      var functionBlockStart = functionNode.range[0] + 1;
+    }
 
-  return defineStatement + requireStatements + block;
+    var defineStatement = content.substring(0, functionBlockStart);
+    var block = content.substring(functionBlockStart, defineEnd);
+    return defineStatement + requireStatements + block;
+  }else{
+    return requireStatements;
+  }
+
 };
 
 /**
@@ -74,31 +81,38 @@ var addImportStatements = function(content, amdNode){
  * @returns {string} The converted source.
  */
  addRequireStatement = function(content, amdNode){
-  var argumentsStart = amdNode.getArrayNode().range[0];
-  var functionNode = amdNode.getFunctionNode();
-  var defineStart = amdNode.node.range[0];
-  var defineString = content.substring(defineStart, argumentsStart);
 
-  if( amdNode.getIsFunctionNode() == 1){
+  var functionNode = amdNode.getFunctionNode();
+  var IsFunctionNode = amdNode.getIsFunctionNode();
+  var defineEnd = amdNode.node.range[1];
+  var requireStatements = '';
+  var defineString = 'define(';
+
+  if( amdNode.getValidNodeIndex() != -1){
+    requireStatements = getRequireStatements(content, amdNode);
+  } 
+
+  if( IsFunctionNode == 1){
     var functionBlockStart = functionNode.body.range[0];
-    var newDefine = 'function(require, exports, module)';
-    var blockContent = content.substring(functionBlockStart, content.length);
-    var result = defineString + newDefine + blockContent;
-    return defineString + newDefine + blockContent;
-  }else if( amdNode.getIsFunctionNode() == 2){
+    var newDefine = 'function(require, exports, module){';
+    var blockContent = content.substring(functionBlockStart+1, content.length);
+    return defineString + newDefine + requireStatements + blockContent;
+  }else if( IsFunctionNode == 2){
     var functionBlockStart = functionNode.range[0];
     var functionBlockEnd = functionNode.range[1];
     var newDefine = 'function(require, exports, module){';
     var blockContent = content.substring(functionBlockStart, functionBlockEnd);
-    var result = defineString + newDefine + 'return ' + blockContent + '});';
-    return defineString + newDefine + 'return ' + blockContent + '});';
-  }else if( amdNode.getIsFunctionNode() == 3){
+    return defineString + newDefine + requireStatements + 'return ' + blockContent + ';});';
+  }else if( IsFunctionNode == 3){
     var functionBlockStart = functionNode.range[0];
     var newDefine = 'function(require, exports, module){';
     var requireStatements = getRequireStatements(content, amdNode);
-    var blockContent = 'return '+ functionNode.name + '(\n' + requireStatements.join(',\n') + '\n);});';
-    var result = defineString + newDefine + blockContent ;
+    var blockContent = 'return '+ functionNode.name + '(' + requireStatements + ');});';
     return defineString + newDefine + blockContent;
+  }else{
+    var newDefine = 'function(require, exports, module){';
+    var blockContent = 'return "";';
+    return defineString + newDefine + requireStatements  + blockContent + '});';
   }
 };
 
@@ -112,8 +126,5 @@ var addImportStatements = function(content, amdNode){
  * @returns {string}
  */
 module.exports = function convert(content, amdNode){
-  var withImports = addImportStatements(content, amdNode);
-  // console.log(withImports);
-  // console.log(addRequireStatement(withImports, amdNode));
-  return addRequireStatement(withImports, amdNode);
+  return addRequireStatement(content, amdNode);
 };
