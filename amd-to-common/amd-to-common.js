@@ -27,8 +27,6 @@ var AMDToCommon = (function(){
    * Read each file and analyse the content
    */
   _convert.prototype.analyse = function(){
-    console.log('\namd2commonjs files:\n'.yellow + this.files.join('\n'));
-
     _.each(this.files, _.bind(function(filename){
       var content = fs.readFileSync(filename, 'utf-8');
       var newContent = this.convertToCommon(content);
@@ -37,6 +35,8 @@ var AMDToCommon = (function(){
       }
       fs.writeFileSync(filename, newContent);
     }, this));
+
+    return true;
   };
 
   /**
@@ -104,7 +104,8 @@ var AMDToCommon = (function(){
 
     if( !isIfCJS ){
       if( isIfAMD ){
-        fileResult = fileResult.replace('define.amd','true');
+        var testRange = isIfAMDNode.node.test.range;
+        fileResult = fileResult.substring(0, testRange[0]) + 'typeof module === "object" && typeof module.exports === "object"' + fileResult.substring(testRange[1]);
       }
     }
 

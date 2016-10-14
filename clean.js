@@ -9,11 +9,7 @@ var normalize = require('path').normalize;
 
 function del(dir, file){
     var name = file.substr(dir.length);
-
-    if(_.exists(file)){
-        console.log('    ' + _.pad(name, 60, ' ') + 'deleted'.red);
-        _.del(file);
-    }
+    _.exists(file) && _.del(file);
 }
 
 module.exports = function(name){
@@ -21,8 +17,6 @@ module.exports = function(name){
     var files = fs.readdirSync(dir);
 
     if(files.length){
-        console.log('\nclean files:'.yellow);
-
         var distDir = normalize(dir + 'dist/');
         var hasDist = files.indexOf('dist') > -1 && _.isDir(distDir);
 
@@ -95,4 +89,6 @@ module.exports = function(name){
 
         _.write(dir + 'bower.json', JSON.stringify(json, null, 2));
     }
+
+    console.log('\nClear files completed!'.blue);
 };

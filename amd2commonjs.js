@@ -7,32 +7,17 @@ var AMDToCommon = require('./amd-to-common/amd-to-common');
 
 module.exports = function(name){
     var dir = normalize(process.cwd()) + '/components/' + name + '/';
-    var filePath = _.isFile(normalize(dir+name+'.js')) ? normalize(dir+name+'.js') : normalize(dir + '/js/' +name+'.js');
-    var file = _.read(filePath);
-
-    function getAllFiles(dir,callback) {
-        var filesArr = [];
-        (function dir(dirpath, fn) {
-            var files = fs.readdirSync(dirpath);
-            files.forEach(function (item, next) {
-                var info = fs.statSync(dirpath + item);
-                if (info.isDirectory()) {
-                    dir(dirpath + item + '/');
-                } else {
-                    var filePath = dirpath + item;
-                    var ldot = filePath.lastIndexOf(".");
-                    var type = filePath.substring(ldot + 1);
-                    if(type == "js") {
-                        filesArr.push(dirpath + item);
-                    }
-                }
-            });
-        })(dir);
-        return filesArr;
-    }
+    var files = feather.util.find(dir, '**.js');
 
     var converter = new AMDToCommon({
-        files: getAllFiles(dir)
+        files: files
     });
-    converter.analyse();
+
+    try{
+        if(converter.analyse()){
+            console.log('Convert to CommonJs completed!'.blue);
+        }
+    }catch(e){
+        console.log('Convert to CommonJs failed!'.red);
+    }
 };

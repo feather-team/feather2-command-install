@@ -53,8 +53,6 @@ exports.run = function(argv, cli, env) {
 
                 //clean 
                 clean(name);
-
-                //amd2commonjs
                 amd2commonjs(name);
             });
         });
