@@ -1,6 +1,6 @@
 {
   "name": "feather2-command-install",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "安装组件",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "dependencies": {
     "bower": "^1.7.9",
     "esprima": "^2.5.0",
-    "traverse": "~0.6.6"
+    "traverse": "~0.6.6",
+    "underscore": "^1.8.3"
   }
 }
