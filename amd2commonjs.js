@@ -17,6 +17,6 @@ module.exports = function(name){
         converter.analyse();
         console.log('Convert to CommonJs completed!'.blue);
     }catch(e){
-        console.log('Convert to CommonJs failed!'.red + ': ' + e.stack);
+        console.log('Convert to CommonJs failed!'.red);
     }
 };
