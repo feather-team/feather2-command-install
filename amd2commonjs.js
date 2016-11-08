@@ -14,10 +14,9 @@ module.exports = function(name){
     });
 
     try{
-        if(converter.analyse()){
-            console.log('Convert to CommonJs completed!'.blue);
-        }
+        converter.analyse();
+        console.log('Convert to CommonJs completed!'.blue);
     }catch(e){
-        console.log('Convert to CommonJs failed!'.red);
+        console.log('Convert to CommonJs failed!'.red + ': ' + e.stack);
     }
 };

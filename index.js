@@ -25,6 +25,10 @@ exports.run = function(argv, cli, env) {
     try{
         argv.directory = 'components';
         bower.commands.install(pkgs, argv, argv).on('log', function(data){
+            if(data.level == 'warn'){
+                throw new Error(data.message);
+            }
+
             var pkgName = data.data.endpoint.source + '@' + data.data.endpoint.target;
             var message = [
                 'download',
