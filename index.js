@@ -19,7 +19,9 @@ exports.run = function(argv, cli, env) {
     }
 
     var pkgs = argv._.slice(1).map(function(item){
-        return item.toString().split('@').join('#');
+        return item.toString().replace(/git@[^:]+:|(@)/g, function(all, at){
+            return at ? '#' : all;
+        });
     });
 
     try{
@@ -40,12 +42,12 @@ exports.run = function(argv, cli, env) {
             console.log(message.join('  '));
         }).on('end', function(pkgs){
             feather.util.map(pkgs, function(name, info){
-                console.log('\n' + name + '@' + info.pkgMeta.version + ' components/' + name);
+                console.log('\n' + name + '@' + (info.pkgMeta.version || 'master') + ' components/' + name);
 
                 var deps = [];
 
                 feather.util.map(info.dependencies || {}, function(name, info){
-                    deps.push(name + '@' + info.pkgMeta.version);
+                    deps.push(name + '@' + (info.pkgMeta.version || 'master'));
                 });
 
                 var max = deps.length - 1;
