@@ -4,9 +4,10 @@ exports.name = 'install';
 exports.usage = 'install [options] <components>[@<version>]';
 exports.desc = 'install components';
 exports.options = {
-    '-F, --force-latest': 'Force latest version on conflict',
-    '-f, --force': 'If dependencies are installed, it reinstalls all installed components. It also forces installation even when there are non-bower directories with the same name in the components directory. Also bypasses the cache and overwrites to the cache anyway.',
-    '-h, --help': 'Show this help message'
+    '--force-latest': 'Force latest version on conflict',
+    '--force': 'If dependencies are installed, it reinstalls all installed components. It also forces installation even when there are non-bower directories with the same name in the components directory. Also bypasses the cache and overwrites to the cache anyway.',
+    '--help': 'Show this help message',
+    '--save': 'Save installed packages into the project\'s bower.json'
 };
 
 var bower = require('bower');
@@ -23,6 +24,12 @@ exports.run = function(argv, cli, env) {
             return at ? '#' : all;
         });
     });
+
+    var root = env.cwd, json = root + '/bower.json';
+
+    if(!feather.util.exists(json)){
+        feather.util.write(json, JSON.stringify({name: "anonymous"}, null, 4));
+    }
 
     try{
         argv.directory = 'components';
