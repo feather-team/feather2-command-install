@@ -31,45 +31,39 @@ exports.run = function(argv, cli, env) {
         feather.util.write(json, JSON.stringify({name: "anonymous"}, null, 4));
     }
 
-    try{
-        argv.directory = 'components';
-        bower.commands.install(pkgs, argv, argv).on('log', function(data){
-            if(data.level == 'warn'){
-                throw new Error(data.message);
-            }
+    argv.directory = 'components';
+    bower.commands.install(pkgs, argv, argv).on('log', function(data){
+        var pkgName = data.data.endpoint.source + '@' + data.data.endpoint.target;
+        var message = [
+            'download',
+            feather.util.pad(pkgName, 20, ' ').green,
+            feather.util.pad(data.id, 15, ' ', true).blue,
+            data.message
+        ];
 
-            var pkgName = data.data.endpoint.source + '@' + data.data.endpoint.target;
-            var message = [
-                'download',
-                feather.util.pad(pkgName, 20, ' ').green,
-                feather.util.pad(data.id, 15, ' ', true).blue,
-                data.message
-            ];
+        console.log(message.join('  '));
+    }).on('end', function(pkgs){
+        feather.util.map(pkgs, function(name, info){
+            console.log('\n' + name + '@' + (info.pkgMeta.version || 'master') + ' components/' + name);
 
-            console.log(message.join('  '));
-        }).on('end', function(pkgs){
-            feather.util.map(pkgs, function(name, info){
-                console.log('\n' + name + '@' + (info.pkgMeta.version || 'master') + ' components/' + name);
+            var deps = [];
 
-                var deps = [];
-
-                feather.util.map(info.dependencies || {}, function(name, info){
-                    deps.push(name + '@' + (info.pkgMeta.version || 'master'));
-                });
-
-                var max = deps.length - 1;
-
-                deps.forEach(function(dep, key){
-                    var b = key == max ? '└──' : '├──';
-                    console.log(b + ' ' + dep);
-                });
-
-                //clean 
-                clean(name);
-                amd2commonjs(name);
+            feather.util.map(info.dependencies || {}, function(name, info){
+                deps.push(name + '@' + (info.pkgMeta.version || 'master'));
             });
+
+            var max = deps.length - 1;
+
+            deps.forEach(function(dep, key){
+                var b = key == max ? '└──' : '├──';
+                console.log(b + ' ' + dep);
+            });
+
+            //clean 
+            clean(name);
+            amd2commonjs(name);
         });
-    }catch(e){};
+    });
 
     process.on('uncaughtException', function(err){
         feather.log.throw = false;
