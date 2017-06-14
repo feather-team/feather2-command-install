@@ -42,7 +42,7 @@ module.exports = function(name){
             }
         }
 
-        if(config && config.clear !== false){
+        if(config && config.clean !== false){
             var mains = _.makeArray(json.main), r = [];
 
             for(var i = 0; i < mains.length; i++){
