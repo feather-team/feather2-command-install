@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var _ = feather.util;
-var cleanList = /\.(?:txt|lock|md)|LICENSE|Grunt|gulp|Gemfile/i;
+var cleanList = /\.(?:txt|lock|md)|LICENSE|Grunt|gulp|Gemfile|webpack/i;
 var configFinds =['bower.json', 'component.json', 'package.json', '.bower.json'];
 var minReg = /[.-]min(?=\.)/;
 var normalize = require('path').normalize;
@@ -42,7 +42,7 @@ module.exports = function(name){
             }
         }
 
-        if(config){
+        if(config && config.clear !== false){
             var mains = _.makeArray(json.main), r = [];
 
             for(var i = 0; i < mains.length; i++){
