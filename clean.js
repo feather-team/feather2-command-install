@@ -17,19 +17,6 @@ module.exports = function(name){
     var files = fs.readdirSync(dir);
 
     if(files.length){
-        var distDir = normalize(dir + 'dist/');
-        var hasDist = files.indexOf('dist') > -1 && _.isDir(distDir);
-
-        files.forEach(function(file){
-            if(
-                cleanList.test(file) 
-                || hasDist && file.indexOf('dist') == -1 && configFinds.indexOf(file) == -1
-            ){
-                del(dir, dir + file);
-                return;
-            }
-        });
-    
         var config, json = {};
 
         for(var i = 0; i < configFinds.length; i++){
@@ -42,7 +29,25 @@ module.exports = function(name){
             }
         }
 
-        if(config && config.clean !== false){
+        if(config && json.clean === false){
+            console.log('\nClear files completed!'.blue);
+            return;
+        }
+
+        var distDir = normalize(dir + 'dist/');
+        var hasDist = files.indexOf('dist') > -1 && _.isDir(distDir);
+
+        files.forEach(function(file){
+            if(
+                cleanList.test(file) 
+                || hasDist && file.indexOf('dist') == -1 && configFinds.indexOf(file) == -1
+            ){
+                del(dir, dir + file);
+                return;
+            }
+        });
+
+        if(config){
             var mains = _.makeArray(json.main), r = [];
 
             for(var i = 0; i < mains.length; i++){
